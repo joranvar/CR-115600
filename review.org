@@ -148,3 +148,31 @@ follow what it does and what it should do.
 #+BEGIN_SRC fsharp
       |> Seq.map getInstruction
 #+END_SRC
+
+* Use pattern matching when decoding
+
+  The ~getInstruction~ function can be written more transparent if you
+  use pattern matching on the list of matches instead of ~if~
+  statements.  This will also remove the need for numerous ~elementat~
+  calls:
+
+#+BEGIN_SRC fsharp
+  let getInstruction (line: string) =
+      let matches =
+          Regex.Matches(line, "[\w\d_]+")
+          |> Seq.cast<Match>
+          |> Seq.filter (fun f -> f.Success) |> Seq.map(fun f-> f.Value)
+          |> Seq.toList
+
+      let operation, [startRow; startCol; _; endRow; endCol] =
+          match matches with
+              | "toggle" ::lights          -> Toggle, lights
+              | "turn"   ::"on"   ::lights -> On, lights
+              | "turn"   ::"off"  ::lights -> Off, lights
+              | _                          -> failwith "Bad instruction format"
+
+      { Operation = operation; StartRow = int startRow; StartCol = int startCol; EndRow = int endRow; EndCol = int endCol }
+#+END_SRC
+
+  I also added a ~failWith~ there, instead of defaulting to ~Off~ on
+  invalid input.

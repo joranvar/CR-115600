@@ -22,21 +22,20 @@ let toggle = function
             | _         -> Switch.On
 
 let getInstruction (line: string) =
-                  let matches = Regex.Matches(line, "[\w\d_]+")
-                                        |> Seq.cast<Match>
-                                        |> Seq.filter (fun f -> f.Success) |> Seq.map(fun f-> f.Value)
+    let matches =
+        Regex.Matches(line, "[\w\d_]+")
+        |> Seq.cast<Match>
+        |> Seq.filter (fun f -> f.Success) |> Seq.map(fun f-> f.Value)
+        |> Seq.toList
 
-                  let action = if matches |> Seq.nth 0 = "toggle" then Toggle
-                                  elif matches |> Seq.nth 1 = "on" then On
-                                  else Off
+    let operation, [startRow; startCol; _; endRow; endCol] =
+        match matches with
+            | "toggle" ::lights          -> Toggle, lights
+            | "turn"   ::"on"   ::lights -> On, lights
+            | "turn"   ::"off"  ::lights -> Off, lights
+            | _                          -> failwith "Bad instruction format"
 
-                  let elementat n = matches |> Seq.nth n |> int
-
-                  match action with
-                  | Toggle -> {Operation = action; StartRow = elementat 1; StartCol = elementat 2;
-                               EndRow = elementat 4 ; EndCol = elementat 5}
-                  | _      -> {Operation = action; StartRow = elementat 2; StartCol = elementat 3;
-                               EndRow = elementat 5 ; EndCol = elementat 6}
+    { Operation = operation; StartRow = int startRow; StartCol = int startCol; EndRow = int endRow; EndCol = int endCol }
 
 let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
     match lang, action, state with
