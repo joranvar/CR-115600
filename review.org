@@ -68,3 +68,43 @@ follow what it does and what it should do.
    Again, this may or may not be easy to do with your editor (or that
    of others who will maintain this code), so it's up to you how to
    align these.
+
+*  Duplicate code
+
+  You may have noticed, the code that solves each of the two problems
+  is very similar.  Actually, the only places where the two blocks of
+  code differ, are the name of the array to adjust, and the name of
+  the language to use for translation.
+
+  We can easily extract a function that can be used for both, if we
+  give it those two changing elements as parameters:
+
+#+BEGIN_SRC fsharp
+  let followInstructions (language: MessageLanguage) (lights: Switch[,]) =
+      "6.txt"
+      |> filereadlines
+      |> Seq.map (fun f -> getInstruction f language)
+      |> Seq.iter(fun ins ->
+          for i in ins.StartRow .. ins.EndRow do
+              for j in ins.StartCol .. ins.EndCol do
+                  lights.[i, j] <- translateCode lights.[i, j] ins.Language ins.Operation)
+      lights
+
+  let lights = Array2D.create 1000 1000 Switch.Off
+  lights
+  |> followInstructions English
+  |> Seq.cast<Switch>
+  |> Seq.filter(fun f -> f = Switch.On)
+  |> Seq.length
+  |> printfn "The number of lights that are turned on are %i"
+
+  let nordiclights = Array2D.create 1000 1000 (Brightness 0)
+  nordiclights
+  |> followInstructions Nordic
+  |> Seq.cast<Switch>
+  |> Seq.map(fun f -> match f with
+                          | Brightness(x) -> x
+                          | _             -> 0)
+  |> Seq.sum
+  |> printfn "The Santa's real nordic decoded message and the total brightness is %i"
+#+END_SRC

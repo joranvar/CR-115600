@@ -49,36 +49,30 @@ let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
         | Nordic,  Off,    Brightness(x)            -> Brightness (x-1)
         | _,       _,      _                        -> Switch.Off
 
-let lights = Array2D.create 1000 1000 Switch.Off
-
-"6.txt"
-|> filereadlines
-|> Seq.map (fun f -> getInstruction f English)
-|> Seq.iter(fun ins ->
+let followInstructions (language: MessageLanguage) (lights: Switch[,]) =
+    "6.txt"
+    |> filereadlines
+    |> Seq.map (fun f -> getInstruction f language)
+    |> Seq.iter(fun ins ->
         for i in ins.StartRow .. ins.EndRow do
             for j in ins.StartCol .. ins.EndCol do
                 lights.[i, j] <- translateCode lights.[i, j] ins.Language ins.Operation)
+    lights
 
+let lights = Array2D.create 1000 1000 Switch.Off
 lights
+|> followInstructions English
 |> Seq.cast<Switch>
 |> Seq.filter(fun f -> f = Switch.On)
 |> Seq.length
 |> printfn "The number of lights that are turned on are %i"
 
-
 let nordiclights = Array2D.create 1000 1000 (Brightness 0)
-"6.txt"
-|> filereadlines
-|> Seq.map (fun f -> getInstruction f Nordic)
-|> Seq.iter(fun ins ->
-        for i in ins.StartRow .. ins.EndRow do
-            for j in ins.StartCol .. ins.EndCol do
-                nordiclights.[i, j] <- translateCode nordiclights.[i, j] ins.Language ins.Operation)
-
 nordiclights
+|> followInstructions Nordic
 |> Seq.cast<Switch>
 |> Seq.map(fun f -> match f with
-                       | Brightness(x) -> x
-                       | _             -> 0)
+                        | Brightness(x) -> x
+                        | _             -> 0)
 |> Seq.sum
 |> printfn "The Santa's real nordic decoded message and the total brightness is %i"
