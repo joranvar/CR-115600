@@ -16,3 +16,55 @@ follow what it does and what it should do.
  I saw you already reformatted the code on github, which is a good
  thing!  Consistent spacing makes it easier for other programmers to
  read the code and not get distracted.
+
+** Alignment of pattern matching
+
+   Although this partly depends on what kind of editor you are using,
+   you could make some pattern matchings more clear by aligning them.
+   For instance:
+
+#+BEGIN_SRC fsharp
+  let toggle = function
+              | Switch.On -> Switch.Off
+              | _ -> Switch.On
+#+END_SRC
+
+   could become
+
+#+BEGIN_SRC fsharp
+  let toggle = function
+              | Switch.On -> Switch.Off
+              | _         -> Switch.On
+#+END_SRC
+
+   And
+
+#+BEGIN_SRC fsharp
+  let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
+      match lang, action, state with
+          | English, Toggle, _ -> toggle state
+          | English, On, _ -> Switch.On
+          | Nordic, Toggle, Brightness(x) -> Brightness (x+2)
+          | Nordic, On, Brightness(x) -> Brightness (x+1)
+          | Nordic, Off, Brightness(x) when x = 0 -> Brightness (0)
+          | Nordic, Off, Brightness(x) -> Brightness (x-1)
+          | _, _, _ -> Switch.Off
+#+END_SRC
+
+   reads easier as
+
+#+BEGIN_SRC fsharp
+  let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
+      match lang, action, state with
+          | English, Toggle, _                        -> toggle state
+          | English, On,     _                        -> Switch.On
+          | Nordic,  Toggle, Brightness(x)            -> Brightness (x+2)
+          | Nordic,  On,     Brightness(x)            -> Brightness (x+1)
+          | Nordic,  Off,    Brightness(x) when x = 0 -> Brightness (0)
+          | Nordic,  Off,    Brightness(x)            -> Brightness (x-1)
+          | _,       _,      _                        -> Switch.Off
+#+END_SRC
+
+   Again, this may or may not be easy to do with your editor (or that
+   of others who will maintain this code), so it's up to you how to
+   align these.

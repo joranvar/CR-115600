@@ -20,7 +20,7 @@ type Instruction = {
 
 let toggle = function
             | Switch.On -> Switch.Off
-            | _ -> Switch.On
+            | _         -> Switch.On
 
 let getInstruction (line: string) (lang: MessageLanguage) =
                   let matches = Regex.Matches(line, "[\w\d_]+")
@@ -36,18 +36,18 @@ let getInstruction (line: string) (lang: MessageLanguage) =
                   match action with
                   | Toggle -> {Operation = action; StartRow = elementat 1; StartCol = elementat 2;
                                EndRow = elementat 4 ; EndCol = elementat 5; Language = lang}
-                  | _ -> {Operation = action; StartRow = elementat 2; StartCol = elementat 3;
-                          EndRow = elementat 5 ; EndCol = elementat 6; Language = lang}
+                  | _      -> {Operation = action; StartRow = elementat 2; StartCol = elementat 3;
+                               EndRow = elementat 5 ; EndCol = elementat 6; Language = lang}
 
 let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
     match lang, action, state with
-        | English, Toggle, _ -> toggle state
-        | English, On, _ -> Switch.On
-        | Nordic, Toggle, Brightness(x) -> Brightness (x+2)
-        | Nordic, On, Brightness(x) -> Brightness (x+1)
-        | Nordic, Off, Brightness(x) when x = 0 -> Brightness (0)
-        | Nordic, Off, Brightness(x) -> Brightness (x-1)
-        | _, _, _ -> Switch.Off
+        | English, Toggle, _                        -> toggle state
+        | English, On,     _                        -> Switch.On
+        | Nordic,  Toggle, Brightness(x)            -> Brightness (x+2)
+        | Nordic,  On,     Brightness(x)            -> Brightness (x+1)
+        | Nordic,  Off,    Brightness(x) when x = 0 -> Brightness (0)
+        | Nordic,  Off,    Brightness(x)            -> Brightness (x-1)
+        | _,       _,      _                        -> Switch.Off
 
 let lights = Array2D.create 1000 1000 Switch.Off
 
@@ -79,6 +79,6 @@ nordiclights
 |> Seq.cast<Switch>
 |> Seq.map(fun f -> match f with
                        | Brightness(x) -> x
-                       | _ -> 0)
+                       | _             -> 0)
 |> Seq.sum
 |> printfn "The Santa's real nordic decoded message and the total brightness is %i"
