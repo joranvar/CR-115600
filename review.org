@@ -9,8 +9,8 @@ follow what it does and what it should do.
 
  First off, a small remark about the spacing.  I think it's interesting
  to write pattern matching without a space after the first character
- (=|=), because it looks like some ascii tree if you end the list with
- the "default" matcher (=|_=).  But I would not recommend it,
+ (~|~), because it looks like some ascii tree if you end the list with
+ the "default" matcher (~|_~).  But I would not recommend it,
  especially while the spacing is not really consistent in the file.
 
  I saw you already reformatted the code on github, which is a good
@@ -109,13 +109,13 @@ follow what it does and what it should do.
   |> printfn "The Santa's real nordic decoded message and the total brightness is %i"
 #+END_SRC
 
-* Don't put the =MessageLanguge= in the =Instruction=
+* Don't put the ~MessageLanguge~ in the ~Instruction~
 
-  The =Instruction= type, and therefor the =getInstruction= function,
-  both keep track of the =MessageLanguage=.  The instruction does not
+  The ~Instruction~ type, and therefor the ~getInstruction~ function,
+  both keep track of the ~MessageLanguage~.  The instruction does not
   contain that information, and only when we translate the instruction
   we need that information.  If you remove this field from the
-  =Instruction= record, the code can be a bit easier to read:
+  ~Instruction~ record, the code can be a bit easier to read:
 
 #+BEGIN_SRC fsharp
   type Instruction = {
@@ -141,7 +141,7 @@ follow what it does and what it should do.
                       lights.[i, j] <- translateCode lights.[i, j] language ins.Operation)
 #+END_SRC
 
-   In fact, that line with =Seq.map (fun f -> getInstruction f)= can
+   In fact, that line with ~Seq.map (fun f -> getInstruction f)~ can
    now benefit from \eta-reduction ("eta reduction"), which means that
    you don't need to write a placeholder variable name:
 
