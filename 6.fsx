@@ -39,13 +39,12 @@ let getInstruction (line: string) =
 
 let translateCode (lang: MessageLanguage) (state: Switch) (action: Action) =
     match lang, action, state with
-        | English, Toggle, _                        -> toggle state
-        | English, On,     _                        -> Switch.On
-        | Nordic,  Toggle, Brightness(x)            -> Brightness (x+2)
-        | Nordic,  On,     Brightness(x)            -> Brightness (x+1)
-        | Nordic,  Off,    Brightness(x) when x = 0 -> Brightness (0)
-        | Nordic,  Off,    Brightness(x)            -> Brightness (x-1)
-        | _,       _,      _                        -> Switch.Off
+        | English, Toggle, _             -> toggle state
+        | English, On,     _             -> Switch.On
+        | Nordic,  Toggle, Brightness(x) -> Brightness (x+2)
+        | Nordic,  On,     Brightness(x) -> Brightness (x+1)
+        | Nordic,  Off,    Brightness(x) -> Brightness (max (x-1) 0)
+        | _,       _,      _             -> Switch.Off
 
 let followInstructions (language: MessageLanguage) (lights: Switch[,]) =
     let translate = translateCode language

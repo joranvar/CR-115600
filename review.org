@@ -204,3 +204,25 @@ follow what it does and what it should do.
   Now =followInstructions= creates a partial applied function
   =translate=, and no longer needs to pass the =language= every time
   when calling it.
+
+* Matching on literals
+
+  In =translateCode=, you can match on a literal =0= instead of using
+  a =when= clause.
+
+#+BEGIN_SRC fsharp
+          | Nordic,  Off,    Brightness(x) when x = 0 -> Brightness (0)
+#+END_SRC
+
+  can be written as
+
+#+BEGIN_SRC fsharp
+          | Nordic,  Off,    Brightness(0) -> Brightness (0)
+#+END_SRC
+
+  Or you could combine the two matches on =Nordic, Off=, using the
+  =max= function:
+
+#+BEGIN_SRC fsharp
+          | Nordic,  Off,    Brightness(x) -> Brightness (max (x-1) 0)
+#+END_SRC
