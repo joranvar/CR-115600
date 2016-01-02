@@ -176,3 +176,31 @@ follow what it does and what it should do.
 
   I also added a ~failWith~ there, instead of defaulting to ~Off~ on
   invalid input.
+
+* Parameter ordering and partial application
+
+  In F#, as in other functional languages, it's customary to order
+  parameters from "least likely to vary" to "most likely to vary".
+  This way, you can benefit from partial application, making calls a
+  bit shorter.  You can do this in =translateCode=, by moving =lang=
+  to the front.  The partial application will then look as follows:
+
+#+BEGIN_SRC fsharp
+  let translateCode (lang: MessageLanguage) (state: Switch) (action: Action) =
+      // ...
+
+  let followInstructions (language: MessageLanguage) (lights: Switch[,]) =
+      let translate = translateCode language
+      "6.txt"
+      |> filereadlines
+      |> Seq.map getInstruction
+      |> Seq.iter(fun ins ->
+          for i in ins.StartRow .. ins.EndRow do
+              for j in ins.StartCol .. ins.EndCol do
+                  lights.[i, j] <- translate lights.[i, j] ins.Operation)
+      lights
+#+END_SRC
+
+  Now =followInstructions= creates a partial applied function
+  =translate=, and no longer needs to pass the =language= every time
+  when calling it.

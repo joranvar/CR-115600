@@ -37,7 +37,7 @@ let getInstruction (line: string) =
 
     { Operation = operation; StartRow = int startRow; StartCol = int startCol; EndRow = int endRow; EndCol = int endCol }
 
-let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
+let translateCode (lang: MessageLanguage) (state: Switch) (action: Action) =
     match lang, action, state with
         | English, Toggle, _                        -> toggle state
         | English, On,     _                        -> Switch.On
@@ -48,13 +48,14 @@ let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
         | _,       _,      _                        -> Switch.Off
 
 let followInstructions (language: MessageLanguage) (lights: Switch[,]) =
+    let translate = translateCode language
     "6.txt"
     |> filereadlines
     |> Seq.map getInstruction
     |> Seq.iter(fun ins ->
         for i in ins.StartRow .. ins.EndRow do
             for j in ins.StartCol .. ins.EndCol do
-                lights.[i, j] <- translateCode lights.[i, j] language ins.Operation)
+                lights.[i, j] <- translate lights.[i, j] ins.Operation)
     lights
 
 let lights = Array2D.create 1000 1000 Switch.Off
