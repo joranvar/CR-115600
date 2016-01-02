@@ -7,7 +7,7 @@ all: test
 test: $(TESTDIR)test6.success
 
 $(TESTDIR)test6.success: 6.fsx
-	env fsharpi $< | diff $(TESTDIR)test6.expect && touch $@
+	env fsharpi $< | diff - $(TESTDIR)test6.expect && touch $@
 
 .PHONY: expect
 expect: 6.fsx
