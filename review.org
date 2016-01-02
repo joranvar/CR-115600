@@ -108,3 +108,43 @@ follow what it does and what it should do.
   |> Seq.sum
   |> printfn "The Santa's real nordic decoded message and the total brightness is %i"
 #+END_SRC
+
+* Don't put the =MessageLanguge= in the =Instruction=
+
+  The =Instruction= type, and therefor the =getInstruction= function,
+  both keep track of the =MessageLanguage=.  The instruction does not
+  contain that information, and only when we translate the instruction
+  we need that information.  If you remove this field from the
+  =Instruction= record, the code can be a bit easier to read:
+
+#+BEGIN_SRC fsharp
+  type Instruction = {
+    Operation: Action
+    StartRow: int
+    StartCol: int
+    EndRow: int
+    EndCol: int
+  }
+
+  let getInstruction (line: string) =
+      // ...
+      match action with
+          | Toggle -> {Operation = action; StartRow = elementat 1; StartCol = elementat 2;
+                       EndRow = elementat 4 ; EndCol = elementat 5}
+          | _      -> {Operation = action; StartRow = elementat 2; StartCol = elementat 3;
+                       EndRow = elementat 5 ; EndCol = elementat 6}
+
+  let followInstructions (language: MessageLanguage) (lights: Switch[,]) =
+      // ...
+      |> Seq.map (fun f -> getInstruction f)
+      // ...
+                      lights.[i, j] <- translateCode lights.[i, j] language ins.Operation)
+#+END_SRC
+
+   In fact, that line with =Seq.map (fun f -> getInstruction f)= can
+   now benefit from \eta-reduction ("eta reduction"), which means that
+   you don't need to write a placeholder variable name:
+
+#+BEGIN_SRC fsharp
+      |> Seq.map getInstruction
+#+END_SRC

@@ -10,19 +10,18 @@ type Action = On | Off | Toggle
 type MessageLanguage = Nordic | English
 
 type Instruction = {
-  Operation: Action;
-  StartRow: int;
-  StartCol: int;
-  EndRow: int;
-  EndCol: int;
-  Language: MessageLanguage
+  Operation: Action
+  StartRow: int
+  StartCol: int
+  EndRow: int
+  EndCol: int
 }
 
 let toggle = function
             | Switch.On -> Switch.Off
             | _         -> Switch.On
 
-let getInstruction (line: string) (lang: MessageLanguage) =
+let getInstruction (line: string) =
                   let matches = Regex.Matches(line, "[\w\d_]+")
                                         |> Seq.cast<Match>
                                         |> Seq.filter (fun f -> f.Success) |> Seq.map(fun f-> f.Value)
@@ -35,9 +34,9 @@ let getInstruction (line: string) (lang: MessageLanguage) =
 
                   match action with
                   | Toggle -> {Operation = action; StartRow = elementat 1; StartCol = elementat 2;
-                               EndRow = elementat 4 ; EndCol = elementat 5; Language = lang}
+                               EndRow = elementat 4 ; EndCol = elementat 5}
                   | _      -> {Operation = action; StartRow = elementat 2; StartCol = elementat 3;
-                               EndRow = elementat 5 ; EndCol = elementat 6; Language = lang}
+                               EndRow = elementat 5 ; EndCol = elementat 6}
 
 let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
     match lang, action, state with
@@ -52,11 +51,11 @@ let translateCode (state: Switch) (lang: MessageLanguage) (action: Action) =
 let followInstructions (language: MessageLanguage) (lights: Switch[,]) =
     "6.txt"
     |> filereadlines
-    |> Seq.map (fun f -> getInstruction f language)
+    |> Seq.map getInstruction
     |> Seq.iter(fun ins ->
         for i in ins.StartRow .. ins.EndRow do
             for j in ins.StartCol .. ins.EndCol do
-                lights.[i, j] <- translateCode lights.[i, j] ins.Language ins.Operation)
+                lights.[i, j] <- translateCode lights.[i, j] language ins.Operation)
     lights
 
 let lights = Array2D.create 1000 1000 Switch.Off
