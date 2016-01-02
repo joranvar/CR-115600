@@ -1,0 +1,18 @@
+#+OPTIONS: toc:nil ^:{}
+
+First off: good job on the code!  It's nice and clear, and easy to
+follow what it does and what it should do.
+
+* Style
+
+** Spaces
+
+ First off, a small remark about the spacing.  I think it's interesting
+ to write pattern matching without a space after the first character
+ (=|=), because it looks like some ascii tree if you end the list with
+ the "default" matcher (=|_=).  But I would not recommend it,
+ especially while the spacing is not really consistent in the file.
+
+ I saw you already reformatted the code on github, which is a good
+ thing!  Consistent spacing makes it easier for other programmers to
+ read the code and not get distracted.
