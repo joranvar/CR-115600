@@ -1,17 +1,28 @@
-TESTDIR ?= test/
+.PHONY: all
+all: test
+
+MAKE_binDir     ?= bin
+
+FSHARP_fsc      ?= env fsharpc
+FSHARP_fsi      ?= env fsharpi
+FSHARP_binDir   ?= $(MAKE_binDir)
+include Makefiles/FSharp.mk
+
+TEST_diff    ?= env diff
+TEST_testDir ?= test
+include Makefiles/Test.mk
+
+OUTPUT    = $(call FSHARP_mkScriptTarget,6.fsx)
+TEST      = $(call TEST_mkCompareTarget,$(OUTPUT))
 
 .PHONY: all
 all: test
 
 .PHONY: test
-test: $(TESTDIR)test6.success
+test: $(TEST)
 
-$(TESTDIR)test6.success: 6.fsx
-	env fsharpi $< | diff - $(TESTDIR)test6.expect && touch $@
+.PHONY: expected
+expected: $(call TEST_mkGoldTarget,$(TEST))
 
-.PHONY: expect
-expect: 6.fsx
-	env fsharpi $< > $(TESTDIR)test6.expect
-
-vpath %.fs src
-vpath %.fsx src
+.PHONY: clean
+clean: cleanall
