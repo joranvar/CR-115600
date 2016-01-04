@@ -25,7 +25,7 @@ let getInstruction (line: string) =
     let matches =
         Regex.Matches(line, "[\w\d_]+")
         |> Seq.cast<Match>
-        |> Seq.filter (fun f -> f.Success) |> Seq.map(fun f-> f.Value)
+        |> Seq.choose (fun f -> if f.Success then Some f.Value else None)
         |> Seq.toList
 
     let operation, [startRow; startCol; _; endRow; endCol] =
