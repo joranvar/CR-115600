@@ -21,8 +21,8 @@ all: test
 .PHONY: test
 test: $(TEST)
 
-.PHONY: expected
-expected: $(call TEST_mkGoldTarget,$(TEST))
+.PHONY: gold
+gold: $(call TEST_mkGoldTarget,$(TEST))
 
 .PHONY: clean
 clean: cleanall
